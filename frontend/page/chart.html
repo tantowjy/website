@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #chart-container {
+            width: 300px; /* Set the desired width */
+            height: 300px; /* Set the desired height */
+        }
+        .result-text {
+            margin-top: 20px;
+            background-color: #ffecec;
+            padding: 10px;
+            border: 1px solid #ff7f7f;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div class="result-text">
+        77,52% pencarian mengatakan itu <strong>Berita Palsu</strong>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Fakta', 'Berita palsu', 'Tidak dikenal'],
+                datasets: [{
+                    data: [20, 77.52, 2.48],
+                    backgroundColor: ['#00bfae', '#ff4d4d', '#ffc107'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
