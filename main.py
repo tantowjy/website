@@ -8,15 +8,24 @@ app = Flask(__name__)
 
 # Load tokenizer from pickle file
 with open(r'tokenizer_A3.pkl', 'rb') as f:
-    tokenizer = pickle.load(f)
+    tokenizer_A3 = pickle.load(f)
+
+with open(r'tokenizer_bias.pkl', 'rb') as f:
+    tokenizer_bias = pickle.load(f)
 
 # Load TFLite model
-interpreter = tf.lite.Interpreter(model_path='hoax_detection_A3.tflite')
-interpreter.allocate_tensors()
+interpreterHoaks = tf.lite.Interpreter(model_path='hoax_detection_A3.tflite')
+interpreterHoaks.allocate_tensors()
+
+interpreterBias = tf.lite.Interpreter(model_path='bias_detection.tflite')
+interpreterBias.allocate_tensors()
 
 # Get input and output tensor information
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+input_details_hoaks = interpreterHoaks.get_input_details()
+output_details_hoaks = interpreterHoaks.get_output_details()
+
+input_details_bias = interpreterBias.get_input_details()
+output_details_bias = interpreterBias.get_output_details()
 
 @app.route('/')
 def index():
@@ -38,7 +47,7 @@ def predictHoaks():
     news_text = [news_text1 + " " + news_text2]
 
     # Tokenization and padding of news
-    new_sequences = tokenizer.texts_to_sequences(news_text)
+    new_sequences = tokenizer_A3.texts_to_sequences(news_text)
     max_len = 100  # Make sure the maximum length matches the one used when training the model
     new_padded = pad_sequences(new_sequences, maxlen=max_len)
 
@@ -46,13 +55,13 @@ def predictHoaks():
     new_padded = new_padded.astype('float32')
 
     # Set the input tensor with compacted data
-    interpreter.set_tensor(input_details[0]['index'], new_padded)
+    interpreterHoaks.set_tensor(input_details_hoaks[0]['index'], new_padded)
 
     # Run the interpreter to make predictions
-    interpreter.invoke()
+    interpreterHoaks.invoke()
 
     # Get the prediction result from the output tensor
-    predictions_tflite = interpreter.get_tensor(output_details[0]['index'])
+    predictions_tflite = interpreterHoaks.get_tensor(output_details_hoaks[0]['index'])
 
     # Interpreting prediction results
     predicted_labels_tflite = "Hoax" if predictions_tflite[0][0] > 0.5 else "Not Hoax"
@@ -77,24 +86,24 @@ def predictBias():
     news_text = [news_text1 + " " + news_text2]
 
     # Tokenization and padding of news
-    new_sequences = tokenizer.texts_to_sequences(news_text)
-    max_len = 100  # Make sure the maximum length matches the one used when training the model
+    new_sequences = tokenizer_bias.texts_to_sequences(news_text)
+    max_len = 30  # Make sure the maximum length matches the one used when training the model
     new_padded = pad_sequences(new_sequences, maxlen=max_len)
 
     # Convert input data to float32 type
     new_padded = new_padded.astype('float32')
 
     # Set the input tensor with compacted data
-    interpreter.set_tensor(input_details[0]['index'], new_padded)
+    interpreterBias.set_tensor(input_details_bias[0]['index'], new_padded)
 
     # Run the interpreter to make predictions
-    interpreter.invoke()
+    interpreterBias.invoke()
 
     # Get the prediction result from the output tensor
-    predictions_tflite = interpreter.get_tensor(output_details[0]['index'])
+    predictions_tflite = interpreterBias.get_tensor(output_details_bias[0]['index'])
 
     # Interpreting prediction results
-    predicted_labels_tflite = "Hoax" if predictions_tflite[0][0] > 0.5 else "Not Hoax"
+    predicted_labels_tflite = "Bias" if predictions_tflite[0][0] > 0.5 else "Netral"
     # confidence = float(predictions_tflite[0][0]) if predicted_labels_tflite == "Hoax" else float(1 - predictions_tflite[0][0])
     confidence = float(predictions_tflite[0][0])
 

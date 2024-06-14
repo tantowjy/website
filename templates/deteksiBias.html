@@ -76,16 +76,16 @@
             .then(response => response.json())
             .then(data => {
                 value = data.confidence.toFixed(4) * 100;
-                valueFact = 100 - value;
+                valueNetral = 100 - value;
 
                 // Display Chart
                 const chart = document.getElementById('myChart').getContext('2d');
                 const myChart = new Chart(chart, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Fakta', 'Hoaks'],
+                        labels: ['Netral', 'Bias'],
                         datasets: [{
-                            data: [valueFact, value],
+                            data: [valueNetral, value],
                             backgroundColor: ['#00bfae', '#ff4d4d'],
                             borderWidth: 1
                         }]
@@ -103,9 +103,9 @@
                 // Display result
                 var resultDiv = document.getElementById('result-text');
                 if(value > 50){
-                    resultDiv.innerHTML = `<p><strong>${value}% Berita Palsu</strong></p>`
+                    resultDiv.innerHTML = `<p><strong>${value}% Berita Bias</strong></p>`
                 } else {
-                    resultDiv.innerHTML = `<p><strong>${valueFact}% Berita Faktual</strong></p>`
+                    resultDiv.innerHTML = `<p><strong>${valueNetral}% Berita Netral</strong></p>`
                 }
             })
             .catch(error => {
