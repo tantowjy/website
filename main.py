@@ -6,18 +6,27 @@ from keras.preprocessing.sequence import pad_sequences
 
 app = Flask(__name__)
 
+# file path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+tokenizer_A3_path = os.path.join(current_dir, 'model', 'tokenizer_A3.pkl')
+tokenizer_bias_path = os.path.join(current_dir, 'model', 'tokenizer_bias.pkl')
+
+model_A3_path = os.path.join(current_dir, 'model', 'hoax_detection_A3.tflite')
+model_bias_path = os.path.join(current_dir, 'model', 'bias_detection.tflite')
+
 # Load tokenizer from pickle file
-with open(r'tokenizer_A3.pkl', 'rb') as f:
+with open(tokenizer_A3_path, 'rb') as f:
     tokenizer_A3 = pickle.load(f)
 
-with open(r'tokenizer_bias.pkl', 'rb') as f:
+with open(tokenizer_bias_path, 'rb') as f:
     tokenizer_bias = pickle.load(f)
 
 # Load TFLite model
-interpreterHoaks = tf.lite.Interpreter(model_path='hoax_detection_A3.tflite')
+interpreterHoaks = tf.lite.Interpreter(model_path=model_A3_path)
 interpreterHoaks.allocate_tensors()
 
-interpreterBias = tf.lite.Interpreter(model_path='bias_detection.tflite')
+interpreterBias = tf.lite.Interpreter(model_path=model_bias_path)
 interpreterBias.allocate_tensors()
 
 # Get input and output tensor information
